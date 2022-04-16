@@ -497,6 +497,23 @@ class UsageTest(testutils.BaseTestCase):
         textwrap.dedent(expected_output).lstrip('\n'),
         usage_output)
 
+  @testutils.skipIf(
+      six.PY2,
+      'Python 2 does not support required name-only arguments.')
+  def testUsageOutputFunctionMixedDefaults(self):
+    component = tc.py3.HelpTextComponent().identity
+    t = trace.FireTrace(component, name='FunctionMixedDefaults')
+    usage_output = helptext.UsageText(component, trace=t, verbose=False)
+    expected_output = """
+    Usage: FunctionMixedDefaults <flags>
+      optional flags:        --beta
+      required flags:        --alpha
+
+    For detailed information on this command, run:
+      FunctionMixedDefaults --help"""
+    expected_output = textwrap.dedent(expected_output).lstrip('\n')
+    self.assertEqual(expected_output, usage_output)
+
   def testUsageOutputCallable(self):
     # This is both a group and a command.
     component = tc.CallableWithKeywordArgument()
